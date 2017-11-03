@@ -1,4 +1,8 @@
 # Datamuse4J
+
+This program was initially created by sjblair. I forked their project to make a few modifications to fit the needs of my other
+project, ExperimentalPoemMaker. 
+
 First, please note I am not affiliated with OneLook or Datamuse in any way. I just like the service and decided to implement some Java code to allow easy access to the API.
 
 Datamuse4J is a handler for calling the Datamuse RESTful API. Some background information on Datamuse:
