@@ -1,0 +1,83 @@
+package datamuse;
+
+import java.util.*;
+
+// Parses and organizes the data obtained using DataMuseQuery
+
+public class WordData {
+	
+	// parses through the data found in the given text
+	// returns the data found for the given category as a string
+	// returns null if the category does not exist
+	public String extractData(String text, String category) {
+		int i = 0; // current position in text
+		// Currently not parsing through the data of the given category 
+		boolean readingCategory = false;
+		int start = i; // will mark the index of where the name of a category started
+		while(text.charAt(i) != ']') { // ']' marks the end of the data
+			char currentChar = text.charAt(i);
+			// if not currently reading a category
+			if (currentChar == '"' && !readingCategory) {
+				// the opening quotation mark notes the beginning of the category name
+				start = i + 1; // the category name starts at the next character
+				readingCategory = true;			
+			} else if (currentChar == '"') {
+				// closing quotation mark notes the end of the category name
+				String thisCategory = text.substring(start, i);
+				if (thisCategory.equalsIgnoreCase(category)) {
+					// the data begins after the closing quotation mark
+					return extractData(text.substring(i + 1));
+				}
+				// this was not the correct reading category, so the readingCategory
+				// will be rest to false
+				readingCategory = false;
+			}
+			i++;
+		}
+		return null;
+	}
+	
+	// Extracts the words from the given data and returns them all in a set
+	public Set<String> extractWords(String data) {
+		Set<String> wordSets = new HashSet<String>();
+		Set<String> wordsResult = new HashSet<String>();
+		int start = 0; // current start of word
+		int end = 0;
+		// take each word set and adds it to wordSet
+		// a word set is a set that contains the word and all its data
+		// the given data is assumed to contain one or more of these word sets
+		while (end < data.length() && data.charAt(end) != '}' && data.charAt(end) != ']') {		
+			// word sets end at '}'
+			do {
+				end++;
+			} while (end < data.length() && data.charAt(end) != '}' );
+			String wordData = data.substring(start, end);
+			// adds the current wordData to the wordSet
+			wordSets.add(wordData);
+			// the new start will be the next character
+			start = end + 1;
+			end = start;
+		}
+		// take each word set from the set and extracts the word from it and adds
+		// it to the wordResult stack
+		for (String word : wordSets) {
+			wordsResult.add(extractData(word, "word"));	
+		}
+		return wordsResult;
+	}
+	
+	// Extracts the data for one category and returns it as a string
+	private String extractData(String text) {
+		int end = 0;
+		// runs until it reaches the end of the data
+		//System.out.println(text + "____");
+		do {
+			end++;
+		} while (text.charAt(end) != ',' && text.charAt(end) != '}');
+		// end marks the beginning for the next category 
+		text = text.substring(0, end);
+		// removes all of the uneccessary characters
+		text = text.replace(" ", "").replace(":", "").replace(",", "").replace("\"", "");
+		return text;
+	}
+}
