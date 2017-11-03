@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Set;
 
 /**
  * A handler for making calls to the Datamuse RESTful API.
@@ -25,6 +26,7 @@ public class DatamuseQuery {
     public DatamuseQuery() {
 
     }
+    
 
     /**
      * Returns a list of similar words to the word/phrase supplied.
@@ -103,6 +105,26 @@ public class DatamuseQuery {
     public String speltSimilar(String word) {
         String s = word.replaceAll(" ", "+");
         return getJSON("http://api.datamuse.com/words?sp=" + s);
+    }
+    
+    public String syllables(String word) {
+    	if (word == null) {
+    		return "-1";// temp fix
+    	}
+    	String s = word.replaceAll(" ", "+");
+    	return new WordData().extractData(getJSON("http://api.datamuse.com/words?sp=" + s + "&md=sp&max=1"), "numsyllables");
+    }
+    
+    public Set<String> getRhymes(String word) {
+    	String s = word.replaceAll(" ", "+");
+    	String data =  getJSON("https://api.datamuse.com/words?rel_rhy=" + s);
+    	return new WordData().extractWords(data);
+    }
+    
+    public Set<String> getNearRhymes(String word) {
+    	String s = word.replaceAll(" ", "+");
+    	String data = getJSON("https://api.datamuse.com/words?rel_nry=" + s);
+    	return new WordData().extractWords(data);
     }
 
     /**
